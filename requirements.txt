@@ -1,0 +1,7 @@
+requests
+pandas
+pyodbc
+pymssql
+xlsxwriter
+openpyxl
+sphinx
