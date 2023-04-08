@@ -52,7 +52,7 @@ If you have the server conexion you could set in the var server.
 <p>&nbsp;</p>
 
 
-### 📀 GET A LIST OF ALL NEODATA'S DB
+### GET A LIST OF ALL NEODATA'S DB
 
 ```python
 
@@ -71,7 +71,7 @@ neodata.getListDb()
 ```
 <p>&nbsp;</p>
 
-### 📀 GET ALL VERSIONS OF BUDGET
+### GET ALL VERSIONS OF BUDGET
 
 ```python
 
@@ -109,7 +109,7 @@ neodata.getListDb()
 	
 ```
 
-### 💵 GET ALL WSB PANEL WITH COST
+### GET ALL WSB PANEL WITH COST
 ```python
 
     neodata.getPartidasWSBWithCost(db='C:\\BUDGET_ONE.mdf',
@@ -134,7 +134,7 @@ neodata.getListDb()
 ]
 	
 ```
-### 💵 GET ALL Budget Items
+### GET ALL Budget Items
 ```python
 
     neodata.getBudgetItems(db='C:\\BUDGET_ONE.mdf',
@@ -168,6 +168,56 @@ neodata.getListDb()
         'IdContratista':item,
         'Bloqueado':item,
         }
+]
+	
+```
+### Special Report
+idBudget = This var is the
+```python
+    neodata.getBudgetReport(db='C:\\BUDGET_ONE.mdf',idBudget='1',idBudgetHeading='15')
+	
+```
+
+```json
+[
+    {
+        'Id':item,
+        'Crt':item,
+        'Partida':item,
+        'Codigo':item,
+        'C.Cliente':item,
+        'Concepto':concept,
+        'Unidad':item,
+        'Cantidad':item,
+        'Volumen':item,
+        'Kg_IM':item,
+        'Kg':item,
+        'Piezas':item,
+        'Base Nivel':item,
+        'Cuerpo':item,
+        'Tipo':item,
+        'Autor':item,
+        'Observaciones':item,
+        'Precio':item    
+    }
+]
+	
+```
+### GET Catalog
+```python
+    neodata.getCatalogo(db='C:\\BUDGET_ONE.mdf')
+	
+```
+```json
+[
+    {
+        'IdCodigo':item,
+        'Codigo':item,
+        'Descripcion':item,
+        'IdUnidad':item,
+        'Unidad':item,
+        'Descripcion_Unidad':item,
+    }
 ]
 	
 ```

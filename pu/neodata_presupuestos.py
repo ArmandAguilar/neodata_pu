@@ -345,4 +345,54 @@ class neodataPu:
                     })
         except Exception as err:
             logging.error(str(err))
+        return data
+
+    def getCatalogo(self,db):
+        """
+        This def get a list of catalogo
+        @param:self
+        @type:object
+
+        @param:db
+        @type:str
+
+        return {version:'version 1'}
+        """
+        data = []
+        try:
+            #1.- GET THE CATALOG
+            sql = "SELECT "\
+	                "Catalogo.[IdCodigo], "\
+                    "Catalogo.[Codigo], "\
+                    "Catalogo.[DescripcionLarga] As 'Descripcion', "\
+                    "Catalogo.[IdUnidad], "\
+                    "Unidades.[Unidad], "\
+                    "Unidades.Descripcion As 'Descripcion Unidad' "\
+                "FROM [dbo].[PuCatalogo] Catalogo,[dbo].[PuUnidades] Unidades "\
+                "WHERE Catalogo.IdUnidad = Unidades.IdUnidad"
+
+            conn_str = (
+                        r'DRIVER={ODBC Driver 17 for SQL Server};'
+                        r'SERVER=' + self.srv + ';'
+                        r'PORT=1433;'
+                        r'DATABASE=' + db + ';'
+                        r'trusted_connection=yes;')
+
+            conn = pyodbc.connect(conn_str)
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            db_query = cursor.fetchall()
+            if len(list(db_query)) > 0:
+                for item in db_query:
+                    data.append({
+                        'IdCodigo':item[0],
+                    'Codigo':item[1],
+                    'Descripcion':item[2],
+                    'IdUnidad':item[3],
+                    'Unidad':item[4],
+                    'Descripcion_Unidad':item[5],
+                    })
+        except Exception as err:
+            logging.error(str(err))
+        
         return data        
