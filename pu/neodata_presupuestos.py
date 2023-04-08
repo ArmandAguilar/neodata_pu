@@ -10,19 +10,24 @@ import pandas as pd
 
 class neodataPu:
 
-    def __init__(self,path_script='C:\\NEODATA2021\\BD\\Scripts\\'):
+    def __init__(self,path_script='C:\\NEODATA2021\\BD\\Scripts\\',srv=''):
         self.srv = ''
         self.path_neodata_script = ''
         self.error = ''
         try:
-            #GET THE INSTANSE SERVER np:\\.\pipe\LOCALDB#D0F9F005\tsql\query
-            subprocess.check_output('sqllocaldb start mssqllocaldb',shell=True)
-            r = subprocess.check_output('sqllocaldb info mssqllocaldb',shell=True)
-            o = r.decode('utf-8')
-            strCon = str(o[251:-1]).replace('\r\r','').replace(': ','').replace('name','')
-            #SELF Vars
-            self.path_neodata_script = path_script
-            self.srv = strCon.strip()      
+            if srv != '':
+                #GET THE INSTANSE SERVER np:\\.\pipe\LOCALDB#D0F9F005\tsql\query
+                subprocess.check_output('sqllocaldb start mssqllocaldb',shell=True)
+                r = subprocess.check_output('sqllocaldb info mssqllocaldb',shell=True)
+                o = r.decode('utf-8')
+                strCon = str(o[251:-1]).replace('\r\r','').replace(': ','').replace('name','')
+                #SELF Vars
+                self.path_neodata_script = path_script
+                self.srv = strCon.strip() 
+            else:
+                self.path_neodata_script = path_script
+                self.srv = srv
+
         except Exception as err:
             self.error = str(err)
     
