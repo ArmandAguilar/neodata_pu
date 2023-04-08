@@ -134,6 +134,43 @@ neodata.getListDb()
 ]
 	
 ```
+### 💵 GET ALL Budget Items
+```python
+
+    neodata.getBudgetItems(db='C:\\BUDGET_ONE.mdf',
+                            idBudget='1'
+	
+```
+```json
+
+[
+    {
+        'IdPresupuestoConcepto':item,
+        'IdPresupuesto':item,
+        'IdPresupuestoPartida':item,
+        'IdExpIns':item,
+        'IdEstimacionTipo':item,
+        'IdAgrupador':item,
+        'Control':item,
+        'Renglon':item,
+        'Cantidad':item,
+        'CantidadTotal':item,
+        'Marca':item,
+        'CodigoAuxiliar':item,
+        'DescripcionAuxiliar':item,
+        'IndirectoEspecial':item,
+        'PorcentajeIndirectoEspecial':item,
+        'RutaGenerador':item,
+        'AEstimar':item,
+        'YaEstimado':item,
+        'Programado':item,
+        'IdCentro':item,
+        'IdContratista':item,
+        'Bloqueado':item,
+        }
+]
+	
+```
 
 
 ## 🍺 Buy me a beer
