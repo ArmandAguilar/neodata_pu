@@ -172,7 +172,9 @@ neodata.getListDb()
 	
 ```
 ### Special Report
-idBudget = This var is the
+idBudget = This var is the id of budget
+idBudgetHeading = This var is [IdPresupuestoPartida]
+
 ```python
     neodata.getBudgetReport(db='C:\\BUDGET_ONE.mdf',idBudget='1',idBudgetHeading='15')
 	
