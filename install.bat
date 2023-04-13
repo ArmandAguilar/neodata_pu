@@ -22,7 +22,6 @@ pip install pyodbc
 pip install pymssql
 pip install xlsxwriter
 pip install openpyxl
-pip install .
 
 :: Make the lib
 python -m build

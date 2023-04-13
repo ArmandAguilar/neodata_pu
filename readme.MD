@@ -7,33 +7,34 @@
 
 ```python
 pip install requests
-pip install sphinx
 pip install pandas
 pip install pyodbc
 pip install pymssql
 pip install xlsxwriter
 pip install openpyxl
-pip install .
 ```
 
-## Install
+## Build the lib.
+into the folder run 
 
-```python
-pip install .
+```cmd
+python -m build
+```
+seek the folder '\dist\neodata_pu-1.0.1-py3-none-any.whl' and install
+```cmd
+pip install \dist\neodata_pu-1.0.1-py3-none-any.whl
 ```
 
 ## Auto Install
 
-
 ```Install For Windows
-C:\neodata_precios_unitarios\install.bat
+install.bat
 ```
-
 
 ## Import
 
 ```python
-from pu.neodata_presupuestos import neodataPu
+from neodata_pu import neodataPu
 ```
 
 ## Initialize Neodata Object
