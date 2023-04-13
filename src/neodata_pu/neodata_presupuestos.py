@@ -16,6 +16,9 @@ class neodataPu:
         self.error = ''
         try:
             if srv != '':
+                self.path_neodata_script = path_script
+                self.srv = srv
+            else:
                 #GET THE INSTANSE SERVER np:\\.\pipe\LOCALDB#D0F9F005\tsql\query
                 subprocess.check_output('sqllocaldb start mssqllocaldb',shell=True)
                 r = subprocess.check_output('sqllocaldb info mssqllocaldb',shell=True)
@@ -23,11 +26,8 @@ class neodataPu:
                 strCon = str(o[251:-1]).replace('\r\r','').replace(': ','').replace('name','')
                 #SELF Vars
                 self.path_neodata_script = path_script
-                self.srv = strCon.strip() 
-            else:
-                self.path_neodata_script = path_script
-                self.srv = srv
-
+                self.srv = strCon.strip()
+                
         except Exception as err:
             self.error = str(err)
     
@@ -400,4 +400,4 @@ class neodataPu:
         except Exception as err:
             logging.error(str(err))
         
-        return data        
+        return data 
