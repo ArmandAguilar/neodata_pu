@@ -5,6 +5,7 @@ import logging
 import subprocess
 import pymssql
 import pyodbc
+import re
 import pandas as pd
 
 
@@ -23,10 +24,17 @@ class neodataPu:
                 subprocess.check_output('sqllocaldb start mssqllocaldb',shell=True)
                 r = subprocess.check_output('sqllocaldb info mssqllocaldb',shell=True)
                 o = r.decode('utf-8')
-                strCon = str(o[251:-1]).replace('\r\r','').replace(': ','').replace('name','')
-                #SELF Vars
-                self.path_neodata_script = path_script
-                self.srv = strCon.strip()
+                #strCon = str(o[251:-1]).replace('\r\r','').replace(': ','').replace('name','')
+                strCon = str(o)
+                patron = r'np:(.*?)(?=query)'
+                resultado = re.search(patron,strCon)
+                if resultado:
+                    subcadena = resultado.group(1)
+                    conStr = 'np:' + resultado.group(1) + 'query'
+
+                    #SELF Vars
+                    self.path_neodata_script = path_script
+                    self.srv = conStr
                 
         except Exception as err:
             self.error = str(err)
@@ -400,4 +408,4 @@ class neodataPu:
         except Exception as err:
             logging.error(str(err))
         
-        return data        
+        return data      

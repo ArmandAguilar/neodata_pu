@@ -12,6 +12,7 @@ pip install pyodbc
 pip install pymssql
 pip install xlsxwriter
 pip install openpyxl
+pip install wheel
 ```
 
 ## Build the lib.
