@@ -50,13 +50,23 @@ class neodataPu:
         data = []
         try:
             #1 GET A LIST OF DB [Budgets] AND CREATE A DB.JSON
-            cmdDB = (r'' + str(self.path_neodata_script) + 'SQLCMD -S "' + str(self.srv) + r'" -h -1 -r 0 -Q "set nocount on; select name from sys.databases for JSON AUTO" > bases.json')
-            subprocess.check_output(cmdDB,shell=True)
+            sql = "select name from sys.databases where name not in ('master','tempdb','model','msdb')"
+            db = 'master'
+            conn_str = (
+                        r'DRIVER={ODBC Driver 17 for SQL Server};'
+                        r'SERVER=' + self.srv + ';'
+                        r'PORT=1433;'
+                        r'DATABASE=' + db + ';'
+                        r'trusted_connection=yes;')
 
-            #2 READ THE DB A PRINT  LIST
-            f = open('bases.json',)
-            data = json.load(f)
-
+            conn = pyodbc.connect(conn_str)
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            db_query = cursor.fetchall()
+            # 2 CONVERT TO JSON
+            if len(list(db_query)) > 0:
+                for item in db_query:
+                    data.append({'name':item[0]})
         except Exception as err:
             logging.info(str(err))
         
@@ -337,7 +347,7 @@ class neodataPu:
                     concept = str(item[5]).replace('\t','')
                     concept = concept.replace('\n','')
                     data.append({
-                        'Id':item[0],
+                        'Id':'0',
                         'Crt':item[1],
                         'Partida':item[2],
                         'Codigo':item[3],
@@ -408,4 +418,4 @@ class neodataPu:
         except Exception as err:
             logging.error(str(err))
         
-        return data      
+        return data
