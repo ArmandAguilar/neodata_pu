@@ -25,7 +25,7 @@ pip install openpyxl
 pip install wheel
 
 :: Make the lib
-::python -m build
+python -m build
 
 ::Install the lib
 pip install %CD%\dist\neodata_pu-1.0.1-py3-none-any.whl
