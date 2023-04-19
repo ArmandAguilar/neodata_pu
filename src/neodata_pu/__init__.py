@@ -124,7 +124,7 @@ class neodataPu:
         data = []
         try:
             #1 .- The List of WBS
-            sql = "SELECT DISTINCT [IdPresupuestoPartida],[PartidaWBS],[IdPartidaPadre],[DescripcionPartidaLarga] "\
+            sql = "SELECT DISTINCT [IdPresupuestoPartida],[PartidaWBS],[IdPartidaPadre],[DescripcionPartidaLarga],[Cantidad] "\
                 " FROM [dbo].[PuPresupuestosPartidas] "\
                 " WHERE IdPresupuesto = '{0}' "\
                 " order by [PartidaWBS],[IdPartidaPadre]".format(idBudget)
@@ -149,6 +149,7 @@ class neodataPu:
                         'PartidaWBS':item[1],
                         'IdPartidaPadre':item[2],
                         'DescripcionPartidaLarga':item[3],
+                        'Cantidad':item[4]
                     })
         except Exception as err:
             logging.error(str(err))
@@ -181,7 +182,8 @@ class neodataPu:
                     "PartidasCosto.[CostoTotal],"\
                     "PartidasCosto.[PrecioTotal],"\
                     "PartidasCosto.[Costo1Nivel],"\
-                    "PartidasCosto.[Precio1Nivel] "\
+                    "PartidasCosto.[Precio1Nivel],"\
+                    "Partidas.[Cantidad] "\
                     "FROM [dbo].[PuPresupuestosPartidas] Partidas,[dbo].[PuPresupuestosPartidasCostos] PartidasCosto "\
                     "WHERE "\
                     "Partidas.IdPresupuesto = '{0}' AND "\
