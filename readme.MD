@@ -176,7 +176,7 @@ neodata.getListDb()
 ## Special Report Level Indent
 idBudget = This var is the id of budget
 
-<b>Type Ident 1</b>
+<b>Type Nodo 1</b>
 ```
 (+) Budget WSB 1
     (+) Body A WSB 1.1
@@ -217,7 +217,7 @@ idBudget = This var is the id of budget
 	
 ```
 
-<b>Type Ident 2</b>
+<b>Type Nodo 2</b>
 ```
 (+) Cuerpo WSB 1
     (+) Partida WSB 1.01
