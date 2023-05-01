@@ -8,6 +8,7 @@ import pyodbc
 import re
 import pandas as pd
 
+
 class neodataPu:
 
     def __init__(self,path_script='C:\\NEODATA2021\\BD\\Scripts\\',srv=''):
@@ -452,7 +453,7 @@ class neodataPu:
                 if int(item['PartidaWBS'].count(".")) == 1:
                     cuerpos.append(item)
             
-            # 2.1  EXPORT ALL BODIES
+            # 2.1  EXPORT ALL CUERPOS
             #df_partida = pd.DataFrame(cuerpos)
             #df_partida.to_excel(f'C:\\NeodataReportesExcel\\cuerpos.xlsx', sheet_name='partidas', engine="openpyxl")
         
@@ -692,9 +693,11 @@ class neodataPu:
                 cuerpo = ''
                 partida = ''
                 nivel = ''
+                
             #4 .- GET CONCEPTS
             #df_wsb = pd.DataFrame(data)
             #df_wsb.to_excel(f'C:\\NeodataReportesExcel\\presupuestos_ver.xlsx', sheet_name='presupuesto', engine="openpyxl")
+        
         except Exception as err:
             logging.error(str(err))
         return data
@@ -1000,9 +1003,11 @@ class neodataPu:
                                                     'Precio':float(item[17])
                                                 })
                                         conn.close()
+
             #Test XLS
             #df_wsb = pd.DataFrame(data)
             #df_wsb.to_excel(f'C:\\NeodataReportesExcel\\presupuestos_2_ver.xlsx', sheet_name='presupuesto', engine="openpyxl")
+        
         except Exception as err:
             logging.error(str(err))
         return data
@@ -1010,7 +1015,6 @@ class neodataPu:
     def getCatalogo(self,db):
         """
         This def get a list of catalogo
-
         @param:self
         @type:object
 
@@ -1047,12 +1051,13 @@ class neodataPu:
                 for item in db_query:
                     data.append({
                         'IdCodigo':item[0],
-                        'Codigo':item[1],
-                        'Descripcion':item[2],
-                        'IdUnidad':item[3],
-                        'Unidad':item[4],
-                        'Descripcion_Unidad':item[5],
+                    'Codigo':item[1],
+                    'Descripcion':item[2],
+                    'IdUnidad':item[3],
+                    'Unidad':item[4],
+                    'Descripcion_Unidad':item[5],
                     })
         except Exception as err:
             logging.error(str(err))
+        
         return data
