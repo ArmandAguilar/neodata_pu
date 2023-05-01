@@ -2,7 +2,7 @@
 ::START SCRIPT
 
 echo -------------------------------------------------------------
-echo "Install Libs"
+echo "Install Libs V1.1"
 echo -------------------------------------------------------------
 
 echo ".__   __.  _______   ______    _______       ___   .___________.    ___      "
@@ -25,7 +25,7 @@ pip install openpyxl
 pip install wheel
 
 :: Make the lib
-python -m build
+::python -m build
 
 ::Install the lib
 pip install %CD%\dist\neodata_pu-1.0.1-py3-none-any.whl
