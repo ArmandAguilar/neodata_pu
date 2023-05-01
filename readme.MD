@@ -217,7 +217,7 @@ idBudget = This var is the id of budget
 	
 ```
 
-<b>Type Ident</b>
+<b>Type Ident 2</b>
 ```
 (+) Cuerpo WSB 1
     (+) Partida WSB 1.01
