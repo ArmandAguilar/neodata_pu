@@ -173,13 +173,22 @@ neodata.getListDb()
 ]
 	
 ```
-### Special Report
+## Special Report Level Indent
 idBudget = This var is the id of budget
-idBudgetHeading = This var is [IdPresupuestoPartida]
+
+<b>Type Ident 1</b>
+```
+(+) Budget WSB 1
+    (+) Body A WSB 1.1
+        (+) Entry 1 WSB 1.1.01
+            (-) Level 1 WSB 1.1.01.001
+    (+) Body B WSB 1.2
+        (+) Entry 1 WSB 1.2.01
+            (-) Level 1 WSB 1.1.02.001
+```
 
 ```python
-    neodata.getBudgetReport(db='C:\\BUDGET_ONE.mdf',idBudget='1',idBudgetHeading='15')
-	
+    neodata.getBudgeBodySimpleIndet(db='C:\\BUDGET_ONE.mdf',idBudget='1')
 ```
 
 ```json
@@ -207,6 +216,49 @@ idBudgetHeading = This var is [IdPresupuestoPartida]
 ]
 	
 ```
+
+<b>Type Ident</b>
+```
+(+) Cuerpo WSB 1
+    (+) Partida WSB 1.01
+        (-) Nivel WSB 1.01.001
+        (-) Nivel WSB 1.01.002
+        (-) Nivel WSB 1.01.003
+    (+) Partida WSB 1.02
+        (-) Nivel WSB 1.02.001
+```
+
+```python
+    neodata.getBudgeBodysEntriesLevesItems(db='C:\\BUDGET_ONE.mdf',idBudget='1')
+```
+
+```json
+[
+    {
+        'Id':item,
+        'Crt':item,
+        'Partida':item,
+        'Codigo':item,
+        'C.Cliente':item,
+        'Concepto':concept,
+        'Unidad':item,
+        'Cantidad':item,
+        'Volumen':item,
+        'Kg_IM':item,
+        'Kg':item,
+        'Piezas':item,
+        'Base Nivel':item,
+        'Cuerpo':item,
+        'Tipo':item,
+        'Autor':item,
+        'Observaciones':item,
+        'Precio':item    
+    }
+]
+	
+```
+
+
 ### GET Catalog
 ```python
     neodata.getCatalogo(db='C:\\BUDGET_ONE.mdf')
