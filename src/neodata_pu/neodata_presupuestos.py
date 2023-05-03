@@ -353,7 +353,7 @@ class neodataPu:
                     concept = concept.replace('\n','')
                     data.append({
                         'Id':'0',
-                        'Crt':item[1],
+                        'Crt':item[0],
                         'Partida':item[2],
                         'Codigo':item[3],
                         'C.Cliente':item[4],
@@ -595,7 +595,7 @@ class neodataPu:
                                             concept = concept.replace('\n','')
                                             data.append({
                                                 'Id':'0',
-                                                'Crt':item[1],
+                                                'Crt':item[0],
                                                 'Partida':partida,
                                                 'Codigo':item[3],
                                                 'C.Cliente':item[4],
@@ -671,7 +671,7 @@ class neodataPu:
                                                     concept = concept.replace('\n','')
                                                     data.append({
                                                         'Id':'0',
-                                                        'Crt':item[1],
+                                                        'Crt':item[0],
                                                         'Partida':partida,
                                                         'Codigo':item[3],
                                                         'C.Cliente':item[4],
@@ -701,7 +701,6 @@ class neodataPu:
         except Exception as err:
             logging.error(str(err))
         return data
-
     def getBudgeBodysEntriesLevesItems(self,db,idBudget):
         """
         This def create all concept like a Reports CFE theme
@@ -836,7 +835,7 @@ class neodataPu:
                                 concept = concept.replace('\n','')
                                 data.append({
                                     'Id':'0',
-                                    'Crt':item[1],
+                                    'Crt':item[0],
                                     'Partida':entry['DescripcionPartidaLarga'],
                                     'Codigo':item[3],
                                     'C.Cliente':item[4],
@@ -910,7 +909,7 @@ class neodataPu:
                                         concept = concept.replace('\n','')
                                         data.append({
                                             'Id':'0',
-                                            'Crt':item[1],
+                                            'Crt':item[0],
                                             'Partida':entry['DescripcionPartidaLarga'],
                                             'Codigo':item[3],
                                             'C.Cliente':item[4],
@@ -984,7 +983,7 @@ class neodataPu:
                                                 concept = concept.replace('\n','')
                                                 data.append({
                                                     'Id':'0',
-                                                    'Crt':item[1],
+                                                    'Crt':item[0],
                                                     'Partida':entry_extra,
                                                     'Codigo':item[3],
                                                     'C.Cliente':item[4],
@@ -1004,6 +1003,393 @@ class neodataPu:
                                                 })
                                         conn.close()
 
+            #Test XLS
+            #df_wsb = pd.DataFrame(data)
+            #df_wsb.to_excel(f'C:\\NeodataReportesExcel\\presupuestos_2_ver.xlsx', sheet_name='presupuesto', engine="openpyxl")
+        
+        except Exception as err:
+            logging.error(str(err))
+        return data
+
+    def getBudgeBodysEntriesLevesItemsExtra(self,db,idBudget):
+        """
+        This def create all concept like a Reports CFE theme
+        @param:self
+        @type:object
+
+        @param:idBudget
+        @type:int
+
+        @param:idBudgetHeading
+        @type:int
+
+        return {}
+        """
+        data = []
+        wbs = []
+        bodies = []
+        body_name = ''
+        try:
+            #1 .- GET THE MAIN NODE WSBP
+            sql = "SELECT  "\
+                    "Partidas.[IdPresupuestoPartida],"\
+                    "Partidas.[PartidaWBS],"\
+                    "Partidas.[IdPartidaPadre],"\
+                    "Partidas.[DescripcionPartidaLarga],"\
+                    "PartidasCosto.[Costo],"\
+                    "PartidasCosto.[Precio],"\
+                    "PartidasCosto.[CostoTotal],"\
+                    "PartidasCosto.[PrecioTotal],"\
+                    "PartidasCosto.[Costo1Nivel],"\
+                    "PartidasCosto.[Precio1Nivel],"\
+                    "Partidas.[Cantidad] "\
+                    "FROM [dbo].[PuPresupuestosPartidas] Partidas,[dbo].[PuPresupuestosPartidasCostos] PartidasCosto "\
+                    "WHERE "\
+                    "Partidas.IdPresupuesto = '{0}' AND "\
+                    "Partidas.IdPresupuestoPartida = PartidasCosto.IdPresupuestoPartida "\
+                    "order by Partidas.[PartidaWBS],Partidas.[IdPartidaPadre]".format(idBudget)
+            
+            conn_str = (
+                        r'DRIVER={ODBC Driver 17 for SQL Server};'
+                        r'SERVER=' + self.srv + ';'
+                        r'PORT=1433;'
+                        r'DATABASE=' + db + ';'
+                        r'trusted_connection=yes;')
+            
+            conn = pyodbc.connect(conn_str)
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            db_query = cursor.fetchall()
+
+            if len(list(db_query)) > 0:
+                for item in db_query:
+                    wbs.append({
+                        "IdPresupuestoPartida":item[0],
+                        "PartidaWBS":item[1],
+                        "IdPartidaPadre":item[2],
+                        "DescripcionPartidaLarga":item[3],
+                        "Costo":float(item[4]),
+                        "Precio":float(item[5]),
+                        "CostoTotal":float(item[6]),
+                        "PrecioTotal":float(item[7]),
+                        "Costo1Nivel":float(item[8]),
+                        "Precio1Nivel":float(item[9]),
+                        "Cantidad":float(item[10])})
+            conn.close()
+
+            # 1.- GET THE BODYs 1 = wsb only are int
+            for item in wbs:
+                if str(item['PartidaWBS']).count('.') == 0:
+                    bodies.append({'id_partida_body':item['IdPresupuestoPartida'],
+                        'id_body_wsp':str(item['PartidaWBS']),
+                        'body':str(item['DescripcionPartidaLarga'])})
+            entries =[]
+            # 2 .- GET THE ENTRIES (PARTIDAS)
+            for body in bodies:
+                print(f"+ ({body['id_body_wsp']}) {body['body']}")
+                body_name = body['body']
+
+                # 2.1 ENTRIES
+                for entry in wbs:
+                    if entry['IdPartidaPadre'] == body['id_partida_body'] and int(entry['Cantidad']) > 0:
+                        entries.append({
+                                        'Id_partida':entry['IdPresupuestoPartida'],
+                                        'PartidaWBS':entry['PartidaWBS'],
+                                        'Partida':entry['DescripcionPartidaLarga']
+                                    })
+                #2.2 RUN ENTRIES AND GET CONCEPTS
+                for items_entry in entries:
+                    print(f"    + ({items_entry['PartidaWBS']}) {items_entry['Partida']}")
+                    sql = "SELECT   "\
+                        "Presupuesto.IdPresupuestoConcepto As Id,"\
+                        "Presupuesto.Control As Crt,"\
+                        "Partida.DescripcionPartidaLarga As Partida,"\
+                        "Catalogo.Codigo As Codigo,"\
+                        "(0) As 'C.Cliente',"\
+                        "Catalogo.DescripcionLarga As Concepto,"\
+                        "Unidades.Unidad As Unidad,"\
+                        "Presupuesto.Cantidad As Cantidad,"\
+                        "(0) As 'Volumen',"\
+                        "(0) As 'Kg_IM',"\
+                        "(0) As 'Kg',"\
+                        "(0) As 'Piezas',"\
+                        "'.' As 'Base Nivel',"\
+                        "'.' As 'Cuerpo',"\
+                        "'.' As 'Tipo',"\
+                        "'.' As 'Autor',"\
+                        "'' AS 'Observaciones',"\
+                        "Precios.[Precio] AS 'Precio' "\
+                        "FROM [dbo].[PuPresupuestosConceptos] Presupuesto,[dbo].[PuPresupuestosPartidas] Partida,"\
+                        "[dbo].[PuPresupuestosConceptosPrecios] Precios,[dbo].[PuExpIns] ExpIns,[dbo].[PuCatalogo] Catalogo,"\
+                        "[dbo].[PuUnidades] Unidades "\
+                        "WHERE "\
+                        "Presupuesto.IdPresupuesto = '{0}' AND "\
+                        "Presupuesto.IdPresupuestoPartida = '{1}' AND "\
+                        "Partida.IdPresupuesto = '{0}' AND "\
+                        "Partida.IdPresupuestoPartida = '{1}' AND "\
+                        "Presupuesto.IdPresupuestoConcepto = Precios.[IdPresupuestoConcepto] AND "\
+                        "Presupuesto.IdExpIns = ExpIns.IdExpIns AND "\
+                        "ExpIns.IdCodigo = Catalogo.IdCodigo AND "\
+                        "Catalogo.IdUnidad = Unidades.IdUnidad AND Presupuesto.Cantidad > '0' "\
+                        " Order By Crt desc".format(idBudget,items_entry['Id_partida'])
+
+                    conn = pyodbc.connect(conn_str)
+                    cursor = conn.cursor()
+                    cursor.execute(sql)
+                    db_query = cursor.fetchall()
+                    if len(list(db_query)) > 0:
+                        for item in db_query:
+                            concept = str(item[5]).replace('\t','')
+                            concept = concept.replace('\n','')
+                            data.append({
+                                'Id':'0',
+                                'Crt':item[0],
+                                'Partida':items_entry['Partida'],
+                                'Codigo':item[3],
+                                'C.Cliente':item[4],
+                                'Concepto':concept,
+                                'Unidad':item[6],
+                                'Cantidad':float(item[7]),
+                                'Volumen':item[8],
+                                'Kg_IM':item[9],
+                                'Kg':item[10],
+                                'Piezas':item[11],
+                                'Base Nivel':'',
+                                'Cuerpo':body_name,
+                                'Tipo':item[14],
+                                'Autor':item[15],
+                                'Observaciones':item[16],
+                                'Precio':float(item[17])
+                            })
+                    conn.close()
+                # 2.3 GET ENTRIERS - LEVES
+                sub_leves = []
+                for items_entry in entries:
+                    print(f"    + ({items_entry['PartidaWBS']}) {items_entry['Partida']}")
+                    for level in wbs:
+                        if str(level['IdPartidaPadre']) == str(items_entry['Id_partida']) and int(level['Cantidad']) > 0:
+                            print(f"        - ({level['PartidaWBS']}) {level['DescripcionPartidaLarga']}")
+                            sub_leves.append({
+                                'id_partida':int(items_entry['Id_partida']),
+                                'partida':str(items_entry['Partida']),
+                                'partida_WBS':str(items_entry['PartidaWBS']),
+                                'id_level':int(level['IdPresupuestoPartida']),
+                                'level':str(level['DescripcionPartidaLarga']),
+                                'level_WBS':str(level['PartidaWBS'])
+                            })
+                            sql = "SELECT   "\
+                                "Presupuesto.IdPresupuestoConcepto As Id,"\
+                                "Presupuesto.Control As Crt,"\
+                                "Partida.DescripcionPartidaLarga As Partida,"\
+                                "Catalogo.Codigo As Codigo,"\
+                                "(0) As 'C.Cliente',"\
+                                "Catalogo.DescripcionLarga As Concepto,"\
+                                "Unidades.Unidad As Unidad,"\
+                                "Presupuesto.Cantidad As Cantidad,"\
+                                "(0) As 'Volumen',"\
+                                "(0) As 'Kg_IM',"\
+                                "(0) As 'Kg',"\
+                                "(0) As 'Piezas',"\
+                                "'.' As 'Base Nivel',"\
+                                "'.' As 'Cuerpo',"\
+                                "'.' As 'Tipo',"\
+                                "'.' As 'Autor',"\
+                                "'' AS 'Observaciones',"\
+                                "Precios.[Precio] AS 'Precio' "\
+                                "FROM [dbo].[PuPresupuestosConceptos] Presupuesto,[dbo].[PuPresupuestosPartidas] Partida,"\
+                                "[dbo].[PuPresupuestosConceptosPrecios] Precios,[dbo].[PuExpIns] ExpIns,[dbo].[PuCatalogo] Catalogo,"\
+                                "[dbo].[PuUnidades] Unidades "\
+                                "WHERE "\
+                                "Presupuesto.IdPresupuesto = '{0}' AND "\
+                                "Presupuesto.IdPresupuestoPartida = '{1}' AND "\
+                                "Partida.IdPresupuesto = '{0}' AND "\
+                                "Partida.IdPresupuestoPartida = '{1}' AND "\
+                                "Presupuesto.IdPresupuestoConcepto = Precios.[IdPresupuestoConcepto] AND "\
+                                "Presupuesto.IdExpIns = ExpIns.IdExpIns AND "\
+                                "ExpIns.IdCodigo = Catalogo.IdCodigo AND "\
+                                "Catalogo.IdUnidad = Unidades.IdUnidad AND Presupuesto.Cantidad > '0' "\
+                                " Order By Crt desc".format(idBudget,level['IdPresupuestoPartida'])
+
+                            conn = pyodbc.connect(conn_str)
+                            cursor = conn.cursor()
+                            cursor.execute(sql)
+                            db_query = cursor.fetchall()
+                            if len(list(db_query)) > 0:
+                                for item in db_query:
+                                    concept = str(item[5]).replace('\t','')
+                                    concept = concept.replace('\n','')
+                                    data.append({
+                                        'Id':'0',
+                                        'Crt':item[0],
+                                        'Partida':items_entry['Partida'],
+                                        'Codigo':item[3],
+                                        'C.Cliente':item[4],
+                                        'Concepto':concept,
+                                        'Unidad':item[6],
+                                        'Cantidad':float(item[7]),
+                                        'Volumen':item[8],
+                                        'Kg_IM':item[9],
+                                        'Kg':item[10],
+                                        'Piezas':item[11],
+                                        'Base Nivel':level['DescripcionPartidaLarga'],
+                                        'Cuerpo':body_name,
+                                        'Tipo':item[14],
+                                        'Autor':item[15],
+                                        'Observaciones':item[16],
+                                        'Precio':float(item[17])
+                                    })
+                            conn.close()
+
+                # 2.3 SUB-LEVELs
+                extra_level = []
+                for sub_item in sub_leves:
+                    print(f"+ ({sub_item['partida_WBS']}) {sub_item['partida']}")
+                    print(f"    + ({sub_item['level_WBS']}) {sub_item['level']}")
+                    for row in wbs:
+                        if str(row['IdPartidaPadre']) == str(sub_item['id_level']) and int(row['Cantidad']) > 0:
+                            print(f"        - ({row['PartidaWBS']}) {row['DescripcionPartidaLarga']}")
+                            extra_level.append({
+                                'id_partida':int(sub_item['id_partida']),
+                                'partida':str(sub_item['partida']),
+                                'partida_WBS':str(sub_item['partida_WBS']),
+                                'id_level':int(sub_item['id_level']),
+                                'level':str(sub_item['level']),
+                                'level_WBS':str(sub_item['level_WBS']),
+                                'id_level_extra':str(row['IdPresupuestoPartida']),
+                                'level_extra':str(row['DescripcionPartidaLarga']),
+                                'level_extra_WBS':str(row['PartidaWBS'])})
+                            sql = "SELECT   "\
+                                "Presupuesto.IdPresupuestoConcepto As Id,"\
+                                "Presupuesto.Control As Crt,"\
+                                "Partida.DescripcionPartidaLarga As Partida,"\
+                                "Catalogo.Codigo As Codigo,"\
+                                "(0) As 'C.Cliente',"\
+                                "Catalogo.DescripcionLarga As Concepto,"\
+                                "Unidades.Unidad As Unidad,"\
+                                "Presupuesto.Cantidad As Cantidad,"\
+                                "(0) As 'Volumen',"\
+                                "(0) As 'Kg_IM',"\
+                                "(0) As 'Kg',"\
+                                "(0) As 'Piezas',"\
+                                "'.' As 'Base Nivel',"\
+                                "'.' As 'Cuerpo',"\
+                                "'.' As 'Tipo',"\
+                                "'.' As 'Autor',"\
+                                "'' AS 'Observaciones',"\
+                                "Precios.[Precio] AS 'Precio' "\
+                                "FROM [dbo].[PuPresupuestosConceptos] Presupuesto,[dbo].[PuPresupuestosPartidas] Partida,"\
+                                "[dbo].[PuPresupuestosConceptosPrecios] Precios,[dbo].[PuExpIns] ExpIns,[dbo].[PuCatalogo] Catalogo,"\
+                                "[dbo].[PuUnidades] Unidades "\
+                                "WHERE "\
+                                "Presupuesto.IdPresupuesto = '{0}' AND "\
+                                "Presupuesto.IdPresupuestoPartida = '{1}' AND "\
+                                "Partida.IdPresupuesto = '{0}' AND "\
+                                "Partida.IdPresupuestoPartida = '{1}' AND "\
+                                "Presupuesto.IdPresupuestoConcepto = Precios.[IdPresupuestoConcepto] AND "\
+                                "Presupuesto.IdExpIns = ExpIns.IdExpIns AND "\
+                                "ExpIns.IdCodigo = Catalogo.IdCodigo AND "\
+                                "Catalogo.IdUnidad = Unidades.IdUnidad AND Presupuesto.Cantidad > '0' "\
+                                " Order By Crt desc".format(idBudget,row['IdPresupuestoPartida'])
+
+                            conn = pyodbc.connect(conn_str)
+                            cursor = conn.cursor()
+                            cursor.execute(sql)
+                            db_query = cursor.fetchall()
+                            if len(list(db_query)) > 0:
+                                for item in db_query:
+                                    concept = str(item[5]).replace('\t','')
+                                    concept = concept.replace('\n','')
+                                    data.append({
+                                        'Id':'0',
+                                        'Crt':item[0],
+                                        'Partida':sub_item['partida'],
+                                        'Codigo':item[3],
+                                        'C.Cliente':item[4],
+                                        'Concepto':concept,
+                                        'Unidad':item[6],
+                                        'Cantidad':float(item[7]),
+                                        'Volumen':item[8],
+                                        'Kg_IM':item[9],
+                                        'Kg':item[10],
+                                        'Piezas':item[11],
+                                        'Base Nivel':'',
+                                        'Cuerpo':body_name,
+                                        'Tipo':item[14],
+                                        'Autor':item[15],
+                                        'Observaciones':item[16],
+                                        'Precio':float(item[17])
+                                    })
+                            conn.close()
+                #2.4 FINAL LEVEL 
+                for sub_item in extra_level:
+                    print(f"+ ({sub_item['partida_WBS']}) {sub_item['partida']}")
+                    print(f"    + ({sub_item['level_WBS']}) {sub_item['level']}")
+                    for row in wbs:
+                        if str(row['IdPartidaPadre']) == str(sub_item['id_level_extra']) and int(row['Cantidad']) > 0:
+                            print(f"        - ({row['PartidaWBS']}) {row['DescripcionPartidaLarga']}")
+                            
+                            sql = "SELECT   "\
+                                "Presupuesto.IdPresupuestoConcepto As Id,"\
+                                "Presupuesto.Control As Crt,"\
+                                "Partida.DescripcionPartidaLarga As Partida,"\
+                                "Catalogo.Codigo As Codigo,"\
+                                "(0) As 'C.Cliente',"\
+                                "Catalogo.DescripcionLarga As Concepto,"\
+                                "Unidades.Unidad As Unidad,"\
+                                "Presupuesto.Cantidad As Cantidad,"\
+                                "(0) As 'Volumen',"\
+                                "(0) As 'Kg_IM',"\
+                                "(0) As 'Kg',"\
+                                "(0) As 'Piezas',"\
+                                "'.' As 'Base Nivel',"\
+                                "'.' As 'Cuerpo',"\
+                                "'.' As 'Tipo',"\
+                                "'.' As 'Autor',"\
+                                "'' AS 'Observaciones',"\
+                                "Precios.[Precio] AS 'Precio' "\
+                                "FROM [dbo].[PuPresupuestosConceptos] Presupuesto,[dbo].[PuPresupuestosPartidas] Partida,"\
+                                "[dbo].[PuPresupuestosConceptosPrecios] Precios,[dbo].[PuExpIns] ExpIns,[dbo].[PuCatalogo] Catalogo,"\
+                                "[dbo].[PuUnidades] Unidades "\
+                                "WHERE "\
+                                "Presupuesto.IdPresupuesto = '{0}' AND "\
+                                "Presupuesto.IdPresupuestoPartida = '{1}' AND "\
+                                "Partida.IdPresupuesto = '{0}' AND "\
+                                "Partida.IdPresupuestoPartida = '{1}' AND "\
+                                "Presupuesto.IdPresupuestoConcepto = Precios.[IdPresupuestoConcepto] AND "\
+                                "Presupuesto.IdExpIns = ExpIns.IdExpIns AND "\
+                                "ExpIns.IdCodigo = Catalogo.IdCodigo AND "\
+                                "Catalogo.IdUnidad = Unidades.IdUnidad AND Presupuesto.Cantidad > '0' "\
+                                " Order By Crt desc".format(idBudget,row['IdPresupuestoPartida'])
+
+                            conn = pyodbc.connect(conn_str)
+                            cursor = conn.cursor()
+                            cursor.execute(sql)
+                            db_query = cursor.fetchall()
+                            if len(list(db_query)) > 0:
+                                for item in db_query:
+                                    concept = str(item[5]).replace('\t','')
+                                    concept = concept.replace('\n','')
+                                    data.append({
+                                        'Id':'0',
+                                        'Crt':item[0],
+                                        'Partida':sub_item['partida'],
+                                        'Codigo':item[3],
+                                        'C.Cliente':item[4],
+                                        'Concepto':concept,
+                                        'Unidad':item[6],
+                                        'Cantidad':float(item[7]),
+                                        'Volumen':item[8],
+                                        'Kg_IM':item[9],
+                                        'Kg':item[10],
+                                        'Piezas':item[11],
+                                        'Base Nivel':'',
+                                        'Cuerpo':body_name,
+                                        'Tipo':item[14],
+                                        'Autor':item[15],
+                                        'Observaciones':item[16],
+                                        'Precio':float(item[17])
+                                    })
+                            conn.close()
             #Test XLS
             #df_wsb = pd.DataFrame(data)
             #df_wsb.to_excel(f'C:\\NeodataReportesExcel\\presupuestos_2_ver.xlsx', sheet_name='presupuesto', engine="openpyxl")
